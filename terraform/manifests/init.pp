@@ -1,10 +1,4 @@
-##
-# cat /var/lib/hiera/common.yaml
-#---
-#terraform::download_uri: https://dl.bintray.com/mitchellh/terraform/terraform_0.6.3_linux_amd64.zip
-#terraform::base_dir: /opt/terraform
-#terraform::owner: root
-
+# Deploy a flat Terraform installation. 
 class terraform(
   $terraform_ensure       = 'present',
   $terraform_base_dir     = hiera('terraform::base_dir'),
@@ -22,14 +16,15 @@ class terraform(
         "unzip -o /tmp/terraform.zip -d ${terraform_base_dir}",
         "chown -R ${terraform_owner} ${terraform_base_dir}",
         # TODO: move to /files/terraform.sh
+        # lint:ignore:80chars lint:ignore:single_quote_string_with_variables
         'echo "export PATH=\${PATH}:/opt/terraform\n" > /etc/profile.d/terraform.sh'
+        # lint:endignore
       ], ' && ')
-      exec { 'make base directory':
+      exec { "Create ${terraform_base_dir}.":
           command => "/bin/mkdir -p ${terraform_base_dir}",
           creates => $terraform_base_dir
       } ->
-      exec {
-        'install terraform':
+      exec { 'Install Terraform binaries.':
           command => $install_command,
           unless  => "test -x ${terraform_base_dir}/terraform",
           user    => $terraform_owner,
@@ -51,3 +46,4 @@ class terraform(
     }
   }
 }
+

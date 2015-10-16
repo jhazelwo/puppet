@@ -1,0 +1,5 @@
+---
+terraform::download_uri: https://dl.bintray.com/mitchellh/terraform/terraform_0.6.3_linux_amd64.zip
+terraform::base_dir: /opt/terraform
+terraform::owner: root
+
